@@ -1,0 +1,40 @@
+x-volumes: &volumes
+  - ./README.md:/README.md
+  - ./source/lexographer:/source/lexographer
+  - ./source/lexographer:/usr/local/lib/python/site-packages/lexographer
+  - ./tests:/tests
+
+services:
+
+  black:
+    container_name: lexographer-black
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: lexographer-black
+    environment:
+      - SERVICE=black
+    volumes:
+      *volumes
+
+  flakes:
+    container_name: lexographer-flakes
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: lexographer-flakes
+    environment:
+      - SERVICE=flakes
+    volumes:
+      *volumes
+
+  tests:
+    container_name: lexographer-tests
+    build:
+      dockerfile: ./Dockerfile
+      context: ./
+    image: lexographer-tests
+    environment:
+      - SERVICE=tests
+    volumes:
+      *volumes

@@ -1,0 +1,5 @@
+# Lexographer Library: Development & Test Dependencies
+black==24.10.*
+pytest==8.3.*
+pytest-codeblocks==0.17.0
+pyflakes
