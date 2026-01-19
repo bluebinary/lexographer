@@ -26,12 +26,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
+        python --version
         python -m pip install --upgrade pip
         python -m pip install black pytest
         if [ -f ./requirements.txt ]; then pip install -r ./requirements.txt; fi
     - name: Lint with Black
       run: |
         # Stop the build if there are any Python syntax or formatting errors
+        black --version
         black ./source ./tests --check
     - name: Test with PyTest
       run: |
