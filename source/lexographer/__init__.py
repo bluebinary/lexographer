@@ -12,7 +12,6 @@ from lexographer.enumerations import (
     Type,
 )
 
-
 __all__ = [
     "Lexer",
     "Position",
