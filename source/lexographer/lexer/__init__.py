@@ -35,8 +35,6 @@ class Lexer(object):
                 "The 'text' argument, if specified, must have a string value!"
             )
 
-        self._text = text
-
         if file is None:
             pass
         elif not isinstance(file, str):
@@ -47,8 +45,6 @@ class Lexer(object):
             raise LexerError("The 'file' argument must reference a valid file path!")
         elif not os.path.isfile(file):
             raise LexerError("The 'file' argument must reference a valid file!")
-
-        self._file = file
 
         if file:
             with open(file, "r") as handle:
@@ -62,7 +58,9 @@ class Lexer(object):
         if (length := len(text.strip())) == 0:
             raise ValueError("The 'text' argument must have a non-empty string value!")
 
+        self._text = text
         self._length: int = length
+        self._file = file
         self._index: int = 0
         self._line: int = 0
         self._column: int = 0
