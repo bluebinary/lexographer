@@ -57,19 +57,12 @@ class Tokenizer(object):
             )
 
         self._lexer = Lexer(text=text, file=file)
-
         self._tokens: list[Token] = []
-
         self._context: Context = Context.Unknown
-
         self._index: int = 0
-
         self._line: int = 1
-
         self._column: int = 1
-
         self._length: int = 0
-
         self._level: int = 0
 
         self.parse()
