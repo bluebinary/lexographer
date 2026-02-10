@@ -60,39 +60,28 @@ The `Lexer` class provides the following methods:
  The `read()` method advances the cursor position after completing the read, so that on
  the next read, the new cursor position is used.
 
- * `peek(length: int = 1)` (`str`) – The `peek()` method supports reading the specified
- length of the input from the current cursor (index) position. By default the method
- will read and return a single character from the current cursor position or a custom
- length as specified by the optional `length` (`int`) parameter.
+ * `peek(offset: int = 0)` (`str`) – The `peek()` method supports peeking ahead of the
+ current cursor (index) position, by zero or more characters. By default the method will
+ read and return a single character from the current cursor position or a single character
+ ahead of or behind the current cursor position as specified via the optional `offset`
+ (`int`) parameter.
  
- If the specified value for the `length` parameter exceeds the number of available characters
- remaining after the current cursor position, a `LexerError` exception will be raised.
+ If the specified value for the `offset` parameter exceeds the available characters that
+ remain beyond the current cursor position, a `LexerError` exception will be raised.
  
- The `peek()` method does not advance the cursor position after completing the read, so
+ The `peek()` method does not advance the cursor position after completing its read, so
  on the next read, the same, unmodified cursor position is used. This allows for one or
- more characters from the current cursor position to be read and checked without affecting
- the cursor.
+ more separate characters from the current cursor position to be read and checked without
+ affecting the cursor position.
 
- * `previous(length: int = 1)` (`str`) – The `previous()` method supports reading the
- specified length of the input from the current cursor (index) position. By default the
- method will read and return a single character prior to the current cursor position or
- a custom length as specified by the optional `length` (`int`) parameter.
- 
- If the specified value for the `length` parameter exceeds the number of available characters
- remaining before the current cursor position, a `LexerError` exception will be raised.
- 
- The `previous()` method does not advance the cursor position after completing the read, so
- on the next read, the same, unmodified cursor position is used. This allows for one or
- more characters prior to the current cursor position to be read and checked without
- affecting the cursor.
-
-* `consume(length: int = 1)` (`None`) – The `consume()` method supports moving the current
+* `consume(length: int = 1)` (`str`) – The `consume()` method supports moving the current
  cursor position forwards according to the specified length. By default the method will
  move the current cursor position a single character forwards from the current cursor
  position or the custom length as specified by the optional `length` (`int`) parameter,
  adjusting the current cursor position by the relevant number of characters.
  
- The method does not return a value; it simply moves the current cursor position.
+ The method returns the current character before the cursor is advanced, to move the
+ current cursor position.
  
  If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the current cursor position, a `LexerError` exception will be raised.
@@ -157,9 +146,9 @@ The `Lexer` class provides the following properties:
  with the cursor's current position in the text string being processed. This same value
  is also available via the `Position` instance's `line` property.
 
- * `column` (`int`) – The `column` property provides access to the column number corresponding
- with the cursor's current position in the text string being processed. This same value
- is also available via the `Position` instance's `column` property.
+ * `column` (`int`) – The `column` property provides access to the column number
+ corresponding with the cursor's current position in the text string being processed.
+ This same value is also available via the `Position` instance's `column` property.
 
  * `characters` (`str`) – The `characters` property provides access to the most recently
  read character or characters, read via the `read()` method. The length of the returned
@@ -199,11 +188,11 @@ The `Position` class offers the following properties:
  * `line` (`int`) – The `line` property provides access to the line number corresponding
  with the cursor's current position in the text string being processed.
 
- * `column` (`int`) – The `column` property provides access to the column number corresponding
- with the cursor's current position in the text string being processed.
+ * `column` (`int`) – The `column` property provides access to the column number
+ corresponding with the cursor's current position in the text string being processed.
 
-Instances of the `Position` class should not need to be created manually, rather instances are
-returned whenever the `Lexer` class' `position` property is accessed.
+Instances of the `Position` class should not need to be created manually, rather
+instances are returned whenever the `Lexer` class' `position` property is accessed.
 
 #### Tokenizer Class
 
@@ -212,8 +201,8 @@ of `Token` class instances which represent all or part of the lexed text.
 
 The `Tokenizer` class offers the following methods:
 
- * `__len__()` (`int`) – The `__len__()` method provides access to the current length of the
- `Tokenizer` class' internal list of tokenized tokens.
+ * `__len__()` (`int`) – The `__len__()` method provides access to the current length of
+ the `Tokenizer` class' internal list of tokenized tokens.
 
  * `__iter__()` (`Tokenizer`) – The `__iter__()` method provides support for iterating over
  the `Tokenizer` class' internal list of tokenized tokens using standard Python iterator
@@ -223,8 +212,8 @@ The `Tokenizer` class offers the following methods:
  the `Tokenizer` class' internal list of tokenized tokens using standard Python iterator
  patterns.
 
- * `next()` (`Token` | `None`) – The `next()` method provides support for obtaining the next `Token` from
- the `Tokenizer` class' internal list of tokenized tokens.
+ * `next()` (`Token` | `None`) – The `next()` method provides support for obtaining the
+ next `Token` from the `Tokenizer` class' internal list of tokenized tokens.
 
  * `next(offset: int = 0)` (`Token` | `None`) – The `next()` method provides support for
  obtaining the next `Token` from the `Tokenizer` class' internal list of tokenized tokens
@@ -475,4 +464,4 @@ optional command line arguments.
 
 ### Copyright & License Information
 
-Copyright © 2026 Daniel Sissman; licensed under the MIT License.
+Copyright © 2025-2026 Daniel Sissman; licensed under the MIT License.
