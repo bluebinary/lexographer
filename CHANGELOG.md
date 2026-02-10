@@ -1,5 +1,9 @@
 # Lexographer Library Change Log
 
+## [0.8.2] - 2026-02-10
+### Changed
+ - Refined Lexer class functionality.
+
 ## [0.8.1] - 2026-01-18
 ### Changed
  - Fixed Lexer file-based instantiation sequence.

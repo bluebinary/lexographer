@@ -62,8 +62,8 @@ class Lexer(object):
         self._length: int = length
         self._file = file
         self._index: int = 0
-        self._line: int = 0
-        self._column: int = 0
+        self._line: int = 1
+        self._column: int = 1
 
     def __len__(self) -> int:
         """Return the source text string length."""
@@ -74,13 +74,13 @@ class Lexer(object):
         """Supports iterating over the source text string."""
 
         self._index = 0
-        self._line = 0
-        self._column = 0
+        self._line = 1
+        self._column = 1
 
         return self
 
     def __next__(self) -> str:
-        """Supports iterating over the individual characters from the source text string."""
+        """Supports iterating over individual characters from the source text string."""
 
         return self.read(length=1)
 
@@ -118,13 +118,13 @@ class Lexer(object):
     def line(self) -> int:
         """Returns the one-indexed line number, i.e. the line numbers start at 1."""
 
-        return self._line + 1
+        return self._line
 
     @property
     def column(self) -> int:
         """Returns the one-indexed column number, i.e. the column numbers start at 1."""
 
-        return self._column + 1
+        return self._column
 
     @property
     def characters(self) -> str:
@@ -133,7 +133,7 @@ class Lexer(object):
         return self._characters
 
     def read(self, length: int = 1) -> str:
-        """Reads the specified number of characters from the contents string."""
+        """Reads/advances the specified number of characters from the source string."""
 
         if not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
@@ -145,84 +145,119 @@ class Lexer(object):
 
         if characters == "\n":
             self._line += 1
-            self._column = 0
+            self._column = 1
 
         return characters
 
-    def peek(self, length: int = 1) -> str:
-        """Returns the specified number of characters ahead of the current position."""
+    def advance(self, length: int = 1) -> str:
+        """The 'advance()' method is an alias for the 'read()' method."""
+
+        return self.read(length=length)
+
+    def peek(self, offset: int = 0, length: int = 1) -> str:
+        """Returns the specified number of characters at the current offset position."""
+
+        if not isinstance(offset, int):
+            raise TypeError("The 'offset' argument must have an integer value!")
 
         if not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
 
-        return self._text[self._index : self._index + length]
+        if self._index + offset + length < self._length:
+            return self._text[self._index + offset : self._index + offset + length]
+        else:
+            return ""
 
-    def previous(self, length: int = 1) -> str:
-        """Returns the specified number of characters before the current position."""
-
-        if not (isinstance(length, int) and length >= 1):
-            raise TypeError("The 'length' argument must have a positive integer value!")
-
-        return self._text[self._index : self._index - length]
-
-    def consume(self, length: int | str = 1) -> None:
-        """Consumes the specified number of characters, moving the position index."""
+    def consume(self, length: int | str = 1, offset: int = 0) -> str:
+        """Consumes the specified number of characters, moving the cursor."""
 
         if isinstance(length, str):
             length = len(length)
         elif not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
 
-        self._index += length
+        if not (isinstance(offset, int) and offset >= 0):
+            raise TypeError("The 'offset' argument must have a positive integer value!")
+        elif self.index + offset >= self.length:
+            raise ValueError(
+                "The 'offset' argument value in addition to the current index exceeds the length!"
+            )
 
-    def push(self, length: int = 1) -> None:
+        self._characters = characters = self._text[self.index : self.index + length]
+
+        self._index += length
+        self._column += length
+
+        if "\n" in characters:
+            self._line += 1
+            self._column = 1
+
+        return characters
+
+    def push(self, length: int | str = 1) -> str:
         """Pushes the specified number of characters back, moving the position index."""
 
-        if not (isinstance(length, int) and length >= 1):
+        if isinstance(length, str):
+            length = len(length)
+        elif not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
+
+        characters: str = self._text[self.index - length : self.index]
 
         self._index -= length
+        self._column += length
 
-    def lookbehind(self, contents: str, length: int = None) -> bool:
-        """Checks if the contents proceeding the current position matches that provided."""
+        if "\n" in characters:
+            self._line -= 1
+            self._column = 1
 
-        if not isinstance(contents, str):
-            raise TypeError("The 'contents' argument must have a string value!")
+        return characters
 
-        if length is None:
-            length = len(contents)
-        elif not (isinstance(length, int) and length >= 1):
-            raise TypeError("The 'length' argument must have a positive integer value!")
+    def lookbehind(
+        self,
+        text: str,
+        offset: int = 0,
+    ) -> bool:
+        """Check if the contents proceeding the current position match that provided."""
 
-        previous: str = self.previous(length=length)
+        if not isinstance(text, str):
+            raise TypeError("The 'text' argument must have a string value!")
+        elif len(text) == 0:
+            raise ValueError("The 'text' argument must have a non-empty string value!")
 
-        matches: bool = previous == contents
+        length: int = len(text)
 
-        return matches
+        if not isinstance(offset, int):
+            raise TypeError("The 'offset' argument must have an integer value!")
+
+        return self.peek(offset=offset, length=length) == text
 
     def lookahead(
-        self, contents: str, length: int = None, consume: bool = False
+        self,
+        text: str,
+        offset: int = 0,
+        consume: bool = False,
     ) -> bool:
-        """Checks if the contents following the current position matches that provided."""
+        """Check if the contents following the current position match that provided."""
 
-        if not isinstance(contents, str):
-            raise TypeError("The 'contents' argument must have a string value!")
+        if not isinstance(text, str):
+            raise TypeError("The 'text' argument must have a string value!")
+        elif len(text) == 0:
+            raise ValueError("The 'text' argument must have a non-empty string value!")
 
-        if length is None:
-            length = len(contents)
-        elif not (isinstance(length, int) and length >= 1):
-            raise TypeError("The 'length' argument must have a positive integer value!")
+        length: int = len(text)
+
+        if not isinstance(offset, int):
+            raise TypeError("The 'offset' argument must have an integer value!")
 
         if not isinstance(consume, bool):
             raise TypeError("The 'consume' argument must have a boolean value!")
 
-        peeked: str = self.peek(length=length)
-
-        matches: bool = peeked == contents
+        matches: bool = self.peek(offset=offset, length=length) == text
 
         # Consume only if the match was successful
         if matches is True and consume is True:
-            self.consume(length=length)
+            self.consume(length=length, offset=offset)
 
         return matches
 
@@ -234,7 +269,7 @@ class Position(object):
     _line: int = None
     _column: int = None
 
-    def __init__(self, index: int, line: int = 0, column: int = 0):
+    def __init__(self, index: int = 0, line: int = 0, column: int = 0):
         """Initialize the new Position class instance with the specified values."""
 
         if not isinstance(index, int):
@@ -248,7 +283,7 @@ class Position(object):
 
         if not isinstance(line, int):
             raise TypeError("The 'line' argument must have an integer value!")
-        elif not line >= 1:
+        elif not line >= 0:
             raise ValueError(
                 "The 'line' argument must have an non-negative integer value!"
             )
@@ -257,7 +292,7 @@ class Position(object):
 
         if not isinstance(column, int):
             raise TypeError("The 'column' argument must have an integer value!")
-        elif not column >= 1:
+        elif not column >= 0:
             raise ValueError(
                 "The 'column' argument must have an non-negative integer value!"
             )
@@ -268,6 +303,99 @@ class Position(object):
         """Returns a string representation of current Position class instance."""
 
         return f"Position(index: {self._index}, line: {self._line}, column: {self._column})"
+
+    def __eq__(self, other: Position) -> bool:
+        """Determine if current Position has values equal to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        if not self.index == other.index:
+            return False
+
+        if not self.column == other.column:
+            return False
+
+        if not self.line == other.line:
+            return False
+
+        return True
+
+    def __neq__(self, other: Position) -> bool:
+        """Determine if current Position has values not-equal to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        return not (self == other)
+
+    def __gt__(self, other: Position) -> bool:
+        """Determine if current Position has values greater-than to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        if self.index > other.index:
+            return True
+
+        if self.column > other.column:
+            return True
+
+        if self.line > other.line:
+            return True
+
+        return False
+
+    def __lt__(self, other: Position) -> bool:
+        """Determine if current Position has values less-than to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        if self.index < other.index:
+            return True
+
+        if self.column < other.column:
+            return True
+
+        if self.line < other.line:
+            return True
+
+        return False
+
+    def __ge__(self, other: Position) -> bool:
+        """Determine if current Position has values greater-than-or-equal to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        if not (self.index >= other.index):
+            return False
+
+        if not (self.column >= other.column):
+            return False
+
+        if not (self.line >= other.line):
+            return False
+
+        return True
+
+    def __le__(self, other: Position) -> bool:
+        """Determine if current Position has values less-than-or-equal to another."""
+
+        if not isinstance(other, Position):
+            return NotImplemented
+
+        if not (self.index <= other.index):
+            return False
+
+        if not (self.column <= other.column):
+            return False
+
+        if not (self.line <= other.line):
+            return False
+
+        return True
 
     @property
     def index(self) -> int:

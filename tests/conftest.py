@@ -8,6 +8,8 @@ sys.path.insert(0, path)  # add 'lexographer' library path for importing into th
 
 import lexographer
 
+assert lexographer.__file__ == os.path.join(path, "lexographer", "__init__.py")
+
 
 @pytest.fixture(scope="session", name="data")
 def data() -> callable:
