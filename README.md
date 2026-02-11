@@ -53,11 +53,11 @@ The `Lexer` class provides the following methods:
  will read and return a single character from the current cursor position or a custom
  length as specified by the optional `length` (`int`) parameter.
  
- If the specified value for the `length` parameter exceeds the number of available characters
+   If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the end of the specified text string or the end of the file, only the
  remaining characters will be returned.
  
- The `read()` method advances the cursor position after completing the read, so that on
+   The `read()` method advances the cursor position after completing the read, so that on
  the next read, the new cursor position is used.
 
  * `peek(offset: int = 0)` (`str`) – The `peek()` method supports peeking ahead of the
@@ -66,10 +66,10 @@ The `Lexer` class provides the following methods:
  ahead of or behind the current cursor position as specified via the optional `offset`
  (`int`) parameter.
  
- If the specified value for the `offset` parameter exceeds the available characters that
+   If the specified value for the `offset` parameter exceeds the available characters that
  remain beyond the current cursor position, a `LexerError` exception will be raised.
  
- The `peek()` method does not advance the cursor position after completing its read, so
+   The `peek()` method does not advance the cursor position after completing its read, so
  on the next read, the same, unmodified cursor position is used. This allows for one or
  more separate characters from the current cursor position to be read and checked without
  affecting the cursor position.
@@ -80,10 +80,10 @@ The `Lexer` class provides the following methods:
  position or the custom length as specified by the optional `length` (`int`) parameter,
  adjusting the current cursor position by the relevant number of characters.
  
- The method returns the current character before the cursor is advanced, to move the
+   The method returns the current character before the cursor is advanced, to move the
  current cursor position.
  
- If the specified value for the `length` parameter exceeds the number of available characters
+   If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the current cursor position, a `LexerError` exception will be raised.
 
 * `push(length: int = 1)` (`None`) – The `push()` method supports moving the current
@@ -92,9 +92,9 @@ The `Lexer` class provides the following methods:
  position or the custom length as specified by the optional `length` (`int`) parameter,
  adjusting the current cursor position by the relevant number of characters.
  
- The method does not return a value; it simply moves the current cursor position.
+   The method does not return a value; it simply moves the current cursor position.
  
- If the specified value for the `length` parameter exceeds the number of available characters
+   If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the current cursor position, a `LexerError` exception will be raised.
 
  * `lookbehind(text: str, length: int = 1)` (`bool`) – The `lookbehind()` method
