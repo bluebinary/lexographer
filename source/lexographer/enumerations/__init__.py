@@ -10,7 +10,8 @@ class Context(Enumeration):
     Unknown = auto()
 
     Start = auto()
-    Finish = auto()
+    Finish = auto(description="The end of file/string/stream has been reached.")
+    NotFound = auto(description="Used in cases when a match cound not be found.")
 
 
 class Type(Enumeration, overwritable=True):

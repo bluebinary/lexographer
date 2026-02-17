@@ -74,7 +74,7 @@ The `Lexer` class provides the following methods:
  more separate characters from the current cursor position to be read and checked without
  affecting the cursor position.
 
-* `consume(length: int = 1)` (`str`) – The `consume()` method supports moving the current
+ * `consume(length: int = 1)` (`str`) – The `consume()` method supports moving the current
  cursor position forwards according to the specified length. By default the method will
  move the current cursor position a single character forwards from the current cursor
  position or the custom length as specified by the optional `length` (`int`) parameter,
@@ -86,15 +86,15 @@ The `Lexer` class provides the following methods:
    If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the current cursor position, a `LexerError` exception will be raised.
 
-* `push(length: int = 1)` (`None`) – The `push()` method supports moving the current
+ * `push(length: int = 1)` (`None`) – The `push()` method supports moving the current
  cursor position backwards according to the specified length. By default the method will
  move the current cursor position a single character backwards from the current cursor
  position or the custom length as specified by the optional `length` (`int`) parameter,
  adjusting the current cursor position by the relevant number of characters.
  
-   The method does not return a value; it simply moves the current cursor position.
+  The method does not return a value; it simply moves the current cursor position.
  
-   If the specified value for the `length` parameter exceeds the number of available characters
+  If the specified value for the `length` parameter exceeds the number of available characters
  remaining before the current cursor position, a `LexerError` exception will be raised.
 
  * `lookbehind(text: str, length: int = 1)` (`bool`) – The `lookbehind()` method
@@ -114,6 +114,18 @@ The `Lexer` class provides the following methods:
  will compare the provided `text` string with a single character of text from the
  current cursor position, or the custom length as specified by the optional `length`
  (`int`) parameter.
+
+ * `expect(text: str, offset: int = 0, raises: bool = False)` (`str`) – The `expect()`
+method supports performing a combined lookahead and consume operation on the specified
+`text` if the specified text matches the text that is immediately ahead of the Lexer's
+current cursor index position, or the current cursor index position, adjusted by the
+optionally specified `offset` value. If the specified text is found, per the lookahead,
+the text will be consumed, causing the current cursor position to be adjusted forward by
+the same number of characters in the `text` string value. If the specified text does not
+follow, by default the method will return an empty string which is considered falsey. If
+it would be helpful to have the method raise an exception, rather than return an empty
+string, if the expected text is not present, the optional `raises` flag can be set to
+`True` which will result in a `LexerError` being raised if the text is not present.
 
 The `Lexer` class provides the following properties:
 
