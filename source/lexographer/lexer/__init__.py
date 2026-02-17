@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from lexographer.logging import logger
 from lexographer.exceptions import LexerError
+from lexographer.enumerations import Context
 
 import os
 
@@ -55,7 +56,7 @@ class Lexer(object):
                         f"Unable to read the contents of the specified file: {file}!"
                     )
 
-        if (length := len(text.strip())) == 0:
+        if (length := len(text)) == 0:
             raise ValueError("The 'text' argument must have a non-empty string value!")
 
         self._text = text
@@ -82,7 +83,13 @@ class Lexer(object):
     def __next__(self) -> str:
         """Supports iterating over individual characters from the source text string."""
 
-        return self.read(length=1)
+        try:
+            return self.read(length=1, raises=True)
+        except LexerError as exception:
+            if exception.context is Context.Finish:
+                raise StopIteration
+            else:
+                raise exception
 
     @property
     def file(self) -> str | None:
@@ -132,11 +139,20 @@ class Lexer(object):
 
         return self._characters
 
-    def read(self, length: int = 1) -> str:
+    def read(self, length: int = 1, raises: bool = False) -> str:
         """Reads/advances the specified number of characters from the source string."""
 
         if not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
+
+        if not isinstance(raises, bool):
+            raise TypeError("The 'raises' argument must have a boolean value!")
+
+        if raises is True and self._index + length > self._length:
+            raise LexerError(
+                f"The 'length' argument value, {length}, in addition to the current index, {self._index}, exceeds the overall length, {self._length}!",
+                context=Context.Finish,
+            )
 
         self._characters = characters = self._text[self._index : self._index + length]
 
@@ -178,12 +194,13 @@ class Lexer(object):
 
         if not (isinstance(offset, int) and offset >= 0):
             raise TypeError("The 'offset' argument must have a positive integer value!")
-        elif self.index + offset >= self.length:
-            raise ValueError(
-                "The 'offset' argument value in addition to the current index exceeds the length!"
+        elif self._index + offset > self._length:
+            raise LexerError(
+                f"The 'offset' argument value, {offset}, in addition to the current index, {self._index}, exceeds the overall length, {self._length}!",
+                context=Context.Finish,
             )
 
-        self._characters = characters = self._text[self.index : self.index + length]
+        self._characters = characters = self._text[self._index : self._index + length]
 
         self._index += length
         self._column += length
@@ -260,6 +277,33 @@ class Lexer(object):
             self.consume(length=length, offset=offset)
 
         return matches
+
+    def expect(self, text: str, offset: int = 0, raises: bool = False) -> str:
+        """Supports performing a combined lookahead and consume on the expected text."""
+
+        if not isinstance(text, str):
+            raise TypeError("The 'text' argument must have a string value!")
+
+        if not isinstance(offset, int):
+            raise TypeError("The 'offset' argument must have an integer value!")
+
+        if not isinstance(raises, bool):
+            raise TypeError("The 'raises' argument must have a boolean value!")
+
+        # If the specified text is present, consume it, adjusting the current
+        # cursor position, then return the text value as confirmation
+        if self.lookahead(text=text, offset=offset) is True:
+            return self.consume(text, offset=offset)
+
+        # Otherwise, if the raises flag was set, raise an error when no match is found
+        if raises is True:
+            raise LexerError(
+                "The expected text, %r, is not present at the current offset!" % (text),
+                context=Context.NotFound,
+            )
+
+        # Otherwise, return an empty (falsey) string as the default behaviour
+        return ""
 
 
 class Position(object):

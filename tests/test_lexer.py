@@ -375,3 +375,58 @@ def text_lexer_lookbehind(lexer: lexographer.Lexer):
     assert lexer.index == 2
     assert lexer.column == 3
     assert lexer.line == 1
+
+
+def text_lexer_expect(lexer: lexographer.Lexer):
+    """Test the Lexer class' .lookbehind() method."""
+
+    # Before any calls to .read() or .consume() the cursor index should be at 0
+    assert lexer.index == 0
+    assert lexer.column == 1
+    assert lexer.line == 1
+
+    # Read the first three characters of the source input text, advancing the cursor
+    read: str = lexer.read(length=3)
+
+    # Ensure that the cursor index position has been advanced as expected by the .read()
+    assert lexer.index == 2
+    assert lexer.column == 3
+    assert lexer.line == 1
+
+    assert isinstance(read, str)
+
+    assert read == "The"
+
+    # Check that the .expect() method call finds and returns the expected following text
+    assert lexer.expect(" ") == " "
+
+    # Ensure that the cursor index position is modified by the call to .expect()
+    assert lexer.index == 3
+    assert lexer.column == 4
+    assert lexer.line == 1
+
+    # Check that the .expect() method call finds and returns the expected following text
+    assert lexer.expect("quick") == "quick"
+
+    # Ensure that the cursor index position is modified by the call to .expect()
+    assert lexer.index == 8
+    assert lexer.column == 9
+    assert lexer.line == 1
+
+    # Check that the .expect() method call does not find text that does not follow; in
+    # this case we look for the non-existent "purple fox" instead of "brown fox" to test
+    # the .expect() method's response for cases when the search text doesn't match:
+    assert lexer.expect("purple fox") == ""
+
+    # Ensure that the cursor index position is not modified by the call to .expect()
+    # when no match is found for the specified text:
+    assert lexer.index == 8
+    assert lexer.column == 9
+    assert lexer.line == 1
+
+    # Check that in cases when the text is not found, and the raises flag is set, that
+    # the .expect() method call raises the LexerError exception, with a NotFound context
+    with pytest.raises(LexerError) as exception:
+        assert lexer.expect("purple fox", raises=True) == ""
+
+        assert exception.context is Context.NotFound
