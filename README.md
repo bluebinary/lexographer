@@ -1,12 +1,12 @@
-# Lexographer: A Pure Python Lexer, Tokenizer & Parser Base Library
+# Lexographer: A Pure Python Lexer, Tokenizer & Parser
 
 The Lexographer library provides pure Python lexer, tokenizer and parser base classes
 for building custom lexers, tokenizers and parsers.
 
 ### Requirements
 
-The Lexographer library has been tested with Python 3.10, 3.11, 3.12 and 3.13. The
-library is not compatible with Python 3.9 or earlier.
+The Lexographer library has been tested with Python 3.10, 3.11, 3.12, 3.13 and 3.14.
+The library is not compatible with Python 3.9 or earlier.
 
 ### Installation
 

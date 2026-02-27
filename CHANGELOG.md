@@ -1,5 +1,9 @@
 # Lexographer Library Change Log
 
+## [0.8.4] - 2026-02-26
+### Added
+ - Added support for Python 3.14.
+
 ## [0.8.3] - 2026-02-16
 ### Added
  - Added `expect()` method to the `Lexer` class to lookahead and consume text if present.

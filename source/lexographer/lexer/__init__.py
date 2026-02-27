@@ -179,7 +179,7 @@ class Lexer(object):
         if not (isinstance(length, int) and length >= 1):
             raise TypeError("The 'length' argument must have a positive integer value!")
 
-        if self._index + offset + length < self._length:
+        if self._index + offset + length <= self._length:
             return self._text[self._index + offset : self._index + offset + length]
         else:
             return ""
